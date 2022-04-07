@@ -5,7 +5,8 @@ import {
   getAuth,
   sendEmailVerification,
   sendPasswordResetEmail,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  updateProfile
 } from "firebase/auth";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button, Form } from 'react-bootstrap';
@@ -17,8 +18,13 @@ function App() {
   const [validated, setValidated] = useState(false);
   const [registered, setRegistered] = useState(false);
   const [error, setError] = useState('');
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const handleNameBlur = e => {
+    setName(e.target.value);
+  }
 
   const handleEmailBlur = e => {
     setEmail(e.target.value);
@@ -65,6 +71,7 @@ function App() {
           setEmail('');
           setPassword('');
           verifyEmail();
+          setUserName();
         })
         .catch(error => {
           console.error(error);
@@ -83,6 +90,18 @@ function App() {
     .catch()
   }
 
+  const setUserName = () => {
+    updateProfile(auth.currentUser, {
+      displayName : name
+    })
+    .then(() => {
+      console.log('Create name');
+    })
+    .catch(error => {
+      setError(error.message);
+    })
+  }
+
   const verifyEmail = () => {
     sendEmailVerification(auth.currentUser)
     .then( () => {
@@ -98,7 +117,7 @@ function App() {
         onSubmit={handleFormSubmit}>
           {!registered && <Form.Group className="mb-3" controlId="formBasicEmail">
             <Form.Label>Your Name</Form.Label>
-            <Form.Control onBlur={handleEmailBlur} type="text" placeholder="Enter your Name" required />
+            <Form.Control onBlur={handleNameBlur} type="text" placeholder="Enter your Name" required />
             <Form.Control.Feedback type="invalid">
               Please provide Your Name.
             </Form.Control.Feedback>
